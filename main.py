@@ -81,14 +81,15 @@ def train_post():
             os.makedirs(folder, exist_ok=True)
             os.makedirs(models, exist_ok=True)
             os.makedirs(data, exist_ok=True)
-            command="docker run -d -p "+ port +":22 --name "+ docker_name +" --gpus device=" \
-            + gpu_usage_index + "  -v /media/data/"+current_user.name +"/:/workspace -w /workspace cssp618/environment:cssp_" \
-            + framework +"_"+ version 
-            
-            # p1 = subprocess.run(command,shell=True)
-            p1 = subprocess.run(args=['docker','run','-d','-p', port+':22','--name',docker_name, \
-            '--gpus','device='+gpu_usage_index,'-v','/media/data/'+current_user.name+'/:/root/', \
-            '-w','/root/','cssp618/environment:cssp_'+framework +"_"+ version+'_ws'])
+            command="docker run -d  --rm -p "+ port +":22 --name "+ docker_name +" --gpus \'\"device=" \
+            + gpu_usage_index + "\"\' -v /media/data/"+current_user.name +"/:/root/ -w /root/ cssp618/environment:cssp_" \
+            + framework +"_"+ version +"_ws" 
+            # gpu_device='device='+ gpu_usage_index
+            # command_gpu_device =  r"'"+ r'"' + gpu_device+ r'"' +r"'" 
+            p1 = subprocess.run(command,shell=True)
+            # p1 = subprocess.run(args=['docker','run','-d','--rm','-p', port+':22','--name',docker_name, \
+            # '--gpus',command_gpu_device,'-v','/media/data/'+current_user.name+'/:/root/', \
+            # '-w','/root/','cssp618/environment:cssp_'+framework +"_"+ version+'_ws'])
             if p1.returncode == 0 :
                 db.session.add(tasks)
                 db.session.commit()
