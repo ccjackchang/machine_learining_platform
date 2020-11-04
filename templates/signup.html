@@ -1,38 +1,89 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block up %}
 <div class="container has-text-centered">
-    <div class="column is-4 is-offset-4">
-        <h3 class="title">Sign Up</h3>
-        <div class="box">
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
+    <div class="columns">
+        <div class="column is-3">
+            <h3 class="title"><br><br><br>Sign Up</h3>
+            <div class="box">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
                 <div class="notification is-danger">
                     {{ messages[0] }}
                 </div>
-            {% endif %}
-            {% endwith %}
-            <form action="/signup" method="POST">
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-large" type="email" name="email" placeholder="Email" autofocus="">
+                {% endif %}
+                {% endwith %}
+                <form action="/signup" method="POST">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input is-large" type="email" name="email" placeholder="Email" autofocus="">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-large" type="text" name="name" placeholder="Name" autofocus="">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input is-large" type="text" name="name" placeholder="Name" autofocus="">
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-large" type="password" name="password" placeholder="Password">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input is-large" type="password" name="password" placeholder="Password">
+                        </div>
                     </div>
-                </div>
 
-                <button class="button is-block is-info is-large is-fullwidth">Sign Up</button>
-            </form>
+                    <button class="button is-block is-info is-large is-fullwidth" name="submit_button" value="add" >Sign Up</button>
+                </form>
+            </div>
+        </div>
+        <div class="column is-four-fifths ">
+            <h3 class="title"><br><br><br>Member</h3>
+            <div class="box">
+
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div style="width: 200px;">Email</div>
+                            </th>
+                            <th>
+                                <div style="width: 200px;">Name</div>
+                            </th>
+                            <th>Modification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in output_data %}
+                        <tr>
+                            <td>{{row.email}}</td>
+                            <td>{{row.name}}</td>
+                            <td>
+                                <form action="/signup" method="POST">
+                                    <div class="field is-grouped">
+                                        <div class="control">
+                                            <input type="hidden" name="email" value={{row.email}}>
+                                            <input type="hidden" name="name" value={{row.name}}>
+                                            {% if row.name == admin %}
+                                            <button class="button is-danger" name="submit_button"
+                                                value="delete" disabled=True>Delete</button>
+                                            {% else %}
+                                            <button class="button is-danger" name="submit_button"
+                                            value="delete">Delete</button>
+                                            {% endif %}
+                                        </div>
+                                        <!-- <div class="control">
+                                        <button class="button is-light is-link" name="submit_button"
+                                            value="modify">Modify</button>
+                                    </div> -->
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
     </div>
 </div>
