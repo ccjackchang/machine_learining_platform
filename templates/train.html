@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block up %}
+<div class="container has-text-centered">
+  <h1 class="title">
+    <br><br><br>Training settings <br><br>
+  </h1>
+
+  <h2>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-danger">
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <form method="POST" action="/train">
+        <table class="table is-centered " width="100%">
+          <thead>
+            <tr>
+              <th class="has-text-centered">User</th>
+              <th class="has-text-centered">Framework</th>
+              <th class="has-text-centered">Version</th>
+              <th class="has-text-centered">GPU</th>
+              <th class="has-text-centered">Training</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th class="has-text-centered" style="vertical-align: middle;">{{current_user.name}}</th>
+              <th class="has-text-centered" style="vertical-align: middle;">
+                <span class="select">
+                  <select class="form-control" id="framework" name="framework">
+                    <option value="" disabled="disabled" style="display:none" selected="selected">Select Framework
+                    </option>
+                    <option value="pytorch">Pytorch</option>
+                    <option value="tensorflow">Tensorflow</option>
+                    <option value="caffe">Caffe</option>
+                  </select>
+                </span>
+
+              </th>
+              <th class="has-text-centered" style="vertical-align: middle;">
+                <span class="select">
+                  <select class="form-control" id="version" name="version">
+                    <option value="" disabled="disabled" style="display:none" selected="selected">Select Version
+                    </option>
+                  </select>
+                </span>
+              </th>
+
+              {% if list_len == 0 %}
+              <th class="has-text-centered is-danger" style="vertical-align: middle;">
+                There is no GPU left !!
+              </th>
+              <th class="has-text-centered" style="vertical-align: middle;">
+                <div class="field is-grouped is-grouped-centered ">
+                  <div class="control">
+                    <button class="button is-success" name="submit_button" value="start" disabled=True>Start</button>
+                  </div>
+                </div>
+              </th>
+              {% else %}
+              <th class="has-text-centered" style="vertical-align: middle;">
+                <div class="field is-grouped is-grouped-centered ">
+                  <div class="select is-multiple">
+                    <select multiple size={{list_len}} name="gpu">
+                      {% for gpu in gpu_list %}
+                      <option value="{{gpu[0]}},{{gpu[1]}}">{{gpu[1]}}</option>
+                      {% endfor %}
+
+                    </select>
+                  </div>
+                </div>
+              </th>
+              <th class="has-text-centered" style="vertical-align: middle;">
+                <div class="field is-grouped is-grouped-centered ">
+                  <div class="control">
+                    <button class="button is-success" name="submit_button" value="start">Start</button>
+                  </div>
+
+                </div>
+              </th>
+              {% endif %}
+            </tr>
+          </tbody>
+        </table>
+      </form>
+      <script>
+        let framework_select = document.getElementById('framework')
+        let version_select = document.getElementById('version')
+
+        framework_select.onchange = function () {
+          framework = framework_select.value;
+          fetch('/version_selected/' + framework).then(function (response) {
+
+            response.json().then(function (data) {
+              let optionHTML = '';
+              for (let version of data.versions_json) {
+                optionHTML += '<option value="' + version.number + '">' + version.number + '</option>'
+              }
+              version_select.innerHTML = optionHTML;
+            });
+          });
+        }
+      </script>
+    </div>
+
+
+    <h1 class="title">
+      <br><br><br>Task
+    </h1>
+    <div class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <table class="table is-centered" width="100%">
+        <thead>
+          <tr>
+            <th class="has-text-centered">User</th>
+            <th class="has-text-centered">Docker Container Name</th>
+            <th class="has-text-centered">IP Address</th>
+            <th class="has-text-centered">GPU</th>
+            <th class="has-text-centered">Training</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in output_data %}
+          <tr>
+              <td class="has-text-centered" style="vertical-align: middle;">{{row.name}}</td>
+              <td class="has-text-centered" style="vertical-align: middle;">{{row.docker_name}}</td>
+              <td class="has-text-centered" style="vertical-align: middle;">{{row.start_time}}</td>
+              <td class="has-text-centered" style="vertical-align: middle;">{{row.gpu}}</td>
+              <td class="has-text-centered" style="vertical-align: middle;">
+                  <form action="/train" method="POST">
+                      <div class="field is-grouped is-grouped-centered">
+                          <div class="control">
+                              <input type="hidden" name="gpu" value="{{row.gpu}}">
+                              <input type="hidden" name="docker_name" value="{{row.docker_name}}">
+                              {% if row.name == current_user.name or current_user.name == admin %}
+                              <button class="button is-danger" name="submit_button"
+                                  value="stop">Stop</button>
+                              {% else %}
+                              <button class="button is-danger" name="submit_button"
+                              value="stop" disabled=True>Stop</button>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </form>
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </form>
+    </div>
+  </h2>
+</div>
+
+{% endblock %}
