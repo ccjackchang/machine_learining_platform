@@ -1,1 +1,1 @@
-# machine_learining_platform
+# machine_learning_platform
