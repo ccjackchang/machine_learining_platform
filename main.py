@@ -81,8 +81,8 @@ def train_post():
             os.makedirs(folder, exist_ok=True)
             os.makedirs(models, exist_ok=True)
             os.makedirs(data, exist_ok=True)
-            command="docker run -d  --rm -p "+ port +":22 --name "+ docker_name +" --gpus \'\"device=" \
-            + gpu_usage_index + "\"\' -v /media/data/"+current_user.name +"/:/root/ -w /root/ cssp618/environment:cssp_" \
+            command="docker run -d --rm -p "+ port +":22 --name "+ docker_name +" --gpus \'\"device=" \
+            + gpu_usage_index + "\"\' -v /media/data/"+current_user.name +"/:/root/"+current_user.name+ "/ -w /root/ cssp618/environment:cssp_" \
             + framework +"_"+ version +"_ws" 
             # gpu_device='device='+ gpu_usage_index
             # command_gpu_device =  r"'"+ r'"' + gpu_device+ r'"' +r"'" 
