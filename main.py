@@ -28,8 +28,12 @@ def train():
     # gpu_list+=test
     gpu_sql = db.session.query(Gpu_status).all()
     for data in gpu_sql:
-        gpu_list.remove(data.index)
-        gpu_list.remove(data.gpu_name)
+        try:
+            gpu_list.remove(data.index)
+            gpu_list.remove(data.gpu_name)
+        except ValueError:
+            pass
+
 
 
     gpu_list = list(zip(gpu_list[::2], gpu_list[1::2]))
@@ -81,8 +85,8 @@ def train_post():
             os.makedirs(folder, exist_ok=True)
             os.makedirs(models, exist_ok=True)
             os.makedirs(data, exist_ok=True)
-            command="docker run -d --rm -p "+ port +":22 --name "+ docker_name +" --gpus \'\"device=" \
-            + gpu_usage_index + "\"\' -v /media/data/"+current_user.name +"/:/root/"+current_user.name+ "/ -v /etc/localtime:/etc/localtime:ro -w /root/ cssp618/environment:cssp_" \
+            command="docker run -d --rm --dns 8.8.8.8 -p "+ port +":22 --name "+ docker_name +" --gpus \'\"device=" \
+            + gpu_usage_index + "\"\' -v /media/data/"+current_user.name +"/:/root/"+current_user.name+ "/ -v /etc/localtime:/etc/localtime:ro -v /media/data/NAS/:/root/NAS/:ro -w /root/ cssp618/environment:cssp_" \
             + framework +"_"+ version +"_ws" 
             # gpu_device='device='+ gpu_usage_index
             # command_gpu_device =  r"'"+ r'"' + gpu_device+ r'"' +r"'" 
